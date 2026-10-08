@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  cybersafe-edge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cybersafe_edge_simulated
+    network_mode: none  # Strict air-gap: Zero internet / external network calls
+    ports:
+      - "5000:5000"
+    # Strict edge hardware resource slice enforcement
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'       # Slices laptop CPU to maximum 2 cores
+          memory: 1024M     # Slices laptop RAM to maximum 1024 MB
+        reservations:
+          cpus: '1.0'
+          memory: 512M
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
+      - OMP_NUM_THREADS=2
+      - MKL_NUM_THREADS=2
+      - OPENBLAS_NUM_THREADS=2
+    restart: unless-stopped
